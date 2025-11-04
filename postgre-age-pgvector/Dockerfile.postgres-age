@@ -1,0 +1,23 @@
+FROM pgvector/pgvector:pg16
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    postgresql-server-dev-16 \
+    libreadline-dev \
+    zlib1g-dev \
+    flex \
+    bison \
+    && rm -rf /var/lib/apt/lists/*
+    
+# Download and install Apache AGE from release
+RUN curl -L https://github.com/apache/age/releases/download/PG17%2Fv1.6.0-rc0/apache-age-1.6.0-src.tar.gz -o /tmp/age.tar.gz \
+    && tar -xzf /tmp/age.tar.gz -C /tmp/ \
+    && cd /tmp/apache-age-1.6.0 \
+    && make install \
+    && rm -rf /tmp/age.tar.gz /tmp/apache-age-1.6.0
+
+# Clean up
+RUN apt-get remove -y build-essential curl postgresql-server-dev-16 \
+    && apt-get autoremove -y
